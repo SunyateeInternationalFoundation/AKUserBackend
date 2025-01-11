@@ -3,8 +3,7 @@ const Parents = require('../models/parents')
 
 function isStringInvalid(string) {
     return string === undefined || string.length === 0;
-  }
-  
+} 
 
 const signUp = async(req, res)=>{
     const {name, email, password , phone} = req.body;
@@ -18,7 +17,7 @@ const signUp = async(req, res)=>{
         }
         const newParent = new Parents({name, email, password, phone});
         await newParent.save();
-        res.status(201).json({success: true,message: 'User registered successfully', data: newParent});
+        res.status(201).json({success: true, message: 'User registered successfully', data: newParent});
     }catch(err){
         console.error(err);
         return res.status(500).json({message: 'Server Error'});
@@ -41,6 +40,7 @@ const login = async (req, res) => {
         return res.status(500).json({message: err.message});
     }
 }
+
 
 
 
