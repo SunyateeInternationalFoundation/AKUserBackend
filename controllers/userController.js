@@ -18,13 +18,11 @@ const signUp = async (req, res) => {
     }
     const newParent = new Parents({ name, email, password, phone });
     await newParent.save();
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "User registered successfully",
-        data: newParent,
-      });
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      data: newParent,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server Error" });
