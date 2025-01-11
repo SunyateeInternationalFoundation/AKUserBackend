@@ -1,4 +1,5 @@
 const Parents = require('../models/parents')
+const Children = require('../models/children')
 
 
 function isStringInvalid(string) {
@@ -41,7 +42,19 @@ const login = async (req, res) => {
     }
 }
 
-
+const newChild = async(req, res)=>{
+    const {name, age, gender, parentEmail} = req.body;
+    if(isStringInvalid(name) || isStringInvalid(age) || isStringInvalid(gender) || isStringInvalid(parentEmail) ){
+        return res.status(400).json({message: 'All fields are required'});
+    }
+    try {
+        const newChild = await newChild(name, age, gender, parentEmail, req.body);
+        res.status(201).json({success: true, message: 'Child registered successfully', data: newChild});
+        
+    } catch (error) {
+        
+    }
+}
 
 
 module.exports = {
