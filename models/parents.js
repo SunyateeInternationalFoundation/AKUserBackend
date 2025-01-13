@@ -9,8 +9,9 @@ const parentSchema = new mongoose.Schema({
   pincode: { type: String, required: false },
   verified: { type: Boolean, default: false },
   image: { type: String, required: false },
-  password: { type: String, required: true}
+  password: { type: String, required: true },
 });
 
 const Parent = mongoose.model("parents", parentSchema);
+
 module.exports = Parent;

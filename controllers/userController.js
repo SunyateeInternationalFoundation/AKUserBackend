@@ -1,6 +1,8 @@
-const Parents = require("../models/parents");
+const Parent = require("../models/parents");
 const Children = require("../models/children");
+const Service = require("../models/services");
 
+console.log("services", Service);
 const signUp = async (req, res) => {
   const { name, email, password, phone } = req.body;
   if (
@@ -12,11 +14,11 @@ const signUp = async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
   }
   try {
-    const parentExist = await Parents.findOne({ email });
+    const parentExist = await Parent.findOne({ email });
     if (parentExist) {
       return res.status(400).json({ message: "Email already exists" });
     }
-    const newParent = new Parents({ name, email, password, phone });
+    const newParent = new Parent({ name, email, password, phone });
     await newParent.save();
     res.status(201).json({
       success: true,
@@ -35,7 +37,7 @@ const login = async (req, res) => {
     return res.status(400).json({ message: "All fields are required" });
   }
   try {
-    const parent = await Parents.findOne({ email });
+    const parent = await Parent.findOne({ email });
     if (parent.password != password) {
       return res.status(401).json({ message: "Incorrect email or password" });
     }
@@ -97,8 +99,70 @@ const isStringInvalid = (str) => {
   return !str || typeof str !== "string" || str.trim().length === 0;
 };
 
+const getParent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const parent = await Parent.findById(id);
+
+    if (!parent) {
+      return res.status(404).json({ message: "Parent not found" });
+    }
+
+    res.status(200).json({ success: true, data: parent });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const updateParent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, phone, address, city, pincode } = req.body;
+
+    const updatedParent = await Parent.findByIdAndUpdate(
+      id,
+      { name, email, phone, address, city, pincode },
+      { new: true }
+    );
+
+    if (!updatedParent) {
+      return res.status(404).json({ message: "Parent not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Parent updated successfully",
+      data: updatedParent,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const getServices = async (req, res) => {
+  console.log("entered....");
+  try {
+    const services = await Service.find();
+    if (!services.length) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No services found" });
+    }
+    console.log("services", services);
+    res.status(200).json({ success: true, data: services });
+  } catch (err) {
+    console.error("service Error", err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 module.exports = {
   signUp,
   login,
   newChild,
+  getParent,
+  updateParent,
+  getServices,
 };
