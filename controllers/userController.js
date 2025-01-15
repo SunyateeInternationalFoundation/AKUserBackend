@@ -93,12 +93,24 @@ const newChild = async (req, res) => {
   }
 };
 
+const getChildren = async (req, res) => {
+    try {
+      const children = await Children.find(); 
+      res.status(200).json(children);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching children data", error });
+    }
+  };
+  
+
 const isStringInvalid = (str) => {
   return !str || typeof str !== "string" || str.trim().length === 0;
 };
+
 
 module.exports = {
   signUp,
   login,
   newChild,
+  getChildren,
 };
