@@ -8,5 +8,9 @@ router.post("/new-child", userController.newChild);
 router.get("/getChildren", userController.getChildren);
 router.get("/:id", userController.getParent);
 router.put("/:id", userController.updateParent);
+router.get("/getProviders/:id", userController.getSelectedProviders);
+router.get("/get-children/:id", userController.getSelectedChildren);
+router.post("/booking-trail", userController.bookingTrial);
+router.get("/bookings/:id", userController.getBookingList);
 
 module.exports = router;

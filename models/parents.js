@@ -11,7 +11,8 @@ const parentSchema = new mongoose.Schema({
   image: { type: String, required: false },
   password: { type: String, required: true },
 });
-
+const providerSchema = new mongoose.Schema({});
+const Providers = mongoose.model("providers", providerSchema);
 const Parent = mongoose.model("parents", parentSchema);
 
-module.exports = Parent;
+module.exports = { Parent, Providers };

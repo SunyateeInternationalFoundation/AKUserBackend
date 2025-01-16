@@ -1,8 +1,8 @@
-const Parent = require("../models/parents");
+const { Parent, Providers } = require("../models/parents");
 const Children = require("../models/children");
 const Service = require("../models/services");
-
-console.log("services", Service);
+const { ObjectId } = require("mongoose").Types;
+const ServiceBookings = require("../models/serviceBookings");
 const signUp = async (req, res) => {
   const { name, email, password, phone } = req.body;
   if (
@@ -60,6 +60,7 @@ const newChild = async (req, res) => {
     medicalInfo,
     behavioralInfo,
     therapyHistory,
+    parentId,
     admissionGoal,
   } = req.body;
 
@@ -73,6 +74,7 @@ const newChild = async (req, res) => {
       age,
       gender,
       parentEmail,
+      parentId: new ObjectId(parentId),
       basicInfo,
       extraDetails: {
         medicalInfo,
@@ -96,14 +98,13 @@ const newChild = async (req, res) => {
 };
 
 const getChildren = async (req, res) => {
-    try {
-      const children = await Children.find(); 
-      res.status(200).json(children);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching children data", error });
-    }
-  };
-  
+  try {
+    const children = await Children.find();
+    res.status(200).json(children);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching children data", error });
+  }
+};
 
 const isStringInvalid = (str) => {
   return !str || typeof str !== "string" || str.trim().length === 0;
@@ -160,14 +161,93 @@ const getServices = async (req, res) => {
         .status(404)
         .json({ success: false, message: "No services found" });
     }
-    console.log("services", services);
+    // console.log("services", services);
     res.status(200).json({ success: true, data: services });
   } catch (err) {
     console.error("service Error", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+const getSelectedProviders = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const objectId = new ObjectId(id);
+    const providers = await Providers.find({
+      services: { $in: [objectId] },
+    });
+    console.log("providers", providers);
+    return res.status(200).json({ success: true, data: providers });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+const getSelectedChildren = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const objectId = new ObjectId(id);
+    const children = await Children.find({
+      parentId: objectId,
+    });
 
+    return res.status(200).json({ success: true, data: children });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+const bookingTrial = async (req, res) => {
+  try {
+    const { serviceId, child, provider, date, time, parentId } = req.body;
+
+    if (
+      !child._id ||
+      !provider._id ||
+      !date ||
+      !time ||
+      !parentId ||
+      !serviceId
+    ) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const serviceBooking = await ServiceBookings.create({
+      childId: new ObjectId(child._id),
+      providerId: new ObjectId(provider._id),
+      date,
+      time,
+      parentId: new ObjectId(parentId),
+      serviceId: new ObjectId(serviceId),
+      status: "On Going",
+      accepted: false,
+    });
+
+    if (!serviceBooking) {
+      return res.status(404).json({ message: "Service booking not found" });
+    }
+
+    return res.status(200).json({ success: true, data: serviceBooking });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+const getBookingList = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const objectId = new ObjectId(id);
+    const bookingList = await ServiceBookings.find({ parentId: objectId })
+      .populate("childId")
+      .populate("providerId")
+      .populate("serviceId");
+
+    console.log("bookingList", bookingList);
+    return res.status(200).json({ success: true, data: bookingList });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
 module.exports = {
   signUp,
   login,
@@ -176,4 +256,8 @@ module.exports = {
   getParent,
   updateParent,
   getServices,
+  getSelectedProviders,
+  getSelectedChildren,
+  bookingTrial,
+  getBookingList,
 };

@@ -8,8 +8,8 @@ const servicesRoutes = require("./routes/servicesRoutes");
 app.use(express.json());
 app.use(cors());
 
-app.use("/", userRoutes);
 app.use("/services", servicesRoutes);
+app.use("/", userRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
