@@ -3,15 +3,18 @@ const Children = require("../models/children");
 const Service = require("../models/services");
 const { ObjectId } = require("mongoose").Types;
 const ServiceBookings = require("../models/serviceBookings");
+
+//--------------- SignUp ----------------//
+
 const signUp = async (req, res) => {
   const { name, email, password, phone } = req.body;
   if (
-    isStringInvalid(email) ||
+    isStringInvalid(name) ||
+    isStringInvalid(email, "email") ||
     isStringInvalid(password) ||
-    isStringInvalid(phone) ||
-    isStringInvalid(name)
+    isStringInvalid(phone, "phone")
   ) {
-    return res.status(400).json({ message: "All fields are required" });
+    return res.status(400).json({ message: "All fields are required and must be valid" });
   }
   try {
     const parentExist = await Parent.findOne({ email });
@@ -31,9 +34,11 @@ const signUp = async (req, res) => {
   }
 };
 
+//--------------- SignIn ----------------//
+
 const login = async (req, res) => {
   const { email, password } = req.body;
-  if (isStringInvalid(email) || isStringInvalid(password)) {
+  if (isStringInvalid(email , "email") || isStringInvalid(password)) {
     return res.status(400).json({ message: "All fields are required" });
   }
   try {
@@ -49,6 +54,8 @@ const login = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
+
+//--------------- Adding New child  ----------------//
 
 const newChild = async (req, res) => {
   const {
@@ -97,6 +104,8 @@ const newChild = async (req, res) => {
   }
 };
 
+//--------------- Getting All children  ----------------//
+
 const getChildren = async (req, res) => {
   try {
     const children = await Children.find();
@@ -106,9 +115,24 @@ const getChildren = async (req, res) => {
   }
 };
 
-const isStringInvalid = (str) => {
-  return !str || typeof str !== "string" || str.trim().length === 0;
+//--------------- Validation function ----------------//
+const isStringInvalid = (str, type = "string") => {
+  if (!str || typeof str !== "string" || str.trim().length === 0) return true;
+
+  if (type === "email") {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email validation
+    return !emailRegex.test(str.trim());
+  }
+
+  if (type === "phone") {
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/; // E.164 international phone format
+    return !phoneRegex.test(str.trim());
+  }
+
+  return false; // Valid string
 };
+
+//--------------- Getting parent by the ID ----------------//
 
 const getParent = async (req, res) => {
   try {
@@ -125,6 +149,8 @@ const getParent = async (req, res) => {
     return res.status(500).json({ message: "Server Error" });
   }
 };
+
+//--------------- Updating parent by the ID ----------------//
 
 const updateParent = async (req, res) => {
   try {
@@ -152,6 +178,8 @@ const updateParent = async (req, res) => {
   }
 };
 
+//--------------- Getting the all services exists ----------------//
+
 const getServices = async (req, res) => {
   console.log("entered....");
   try {
@@ -168,6 +196,9 @@ const getServices = async (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+
+//--------------- Getting the Providers for selected services ----------------//
+
 const getSelectedProviders = async (req, res) => {
   try {
     const { id } = req.params;
@@ -182,6 +213,9 @@ const getSelectedProviders = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+//--------------- Getting the children for selected parent ----------------//
+
 const getSelectedChildren = async (req, res) => {
   try {
     const { id } = req.params;
@@ -196,6 +230,8 @@ const getSelectedChildren = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+//--------------- Service booking for demo version ----------------//
 const bookingTrial = async (req, res) => {
   try {
     const { serviceId, child, provider, date, time, parentId } = req.body;
@@ -232,6 +268,9 @@ const bookingTrial = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+//--------------- Getting the booking list for selected parent ----------------//
+
 const getBookingList = async (req, res) => {
   try {
     const { id } = req.params;
