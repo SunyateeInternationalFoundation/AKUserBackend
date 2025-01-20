@@ -287,7 +287,21 @@ const getBookingList = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+const getOneChild = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const child = await Children.findById(id);
 
+    if (!child) {
+      return res.status(404).json({ message: "Child not found" });
+    }
+
+    res.status(200).json({ success: true, data: child });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};
 module.exports = {
   signUp,
   login,
@@ -300,4 +314,5 @@ module.exports = {
   getSelectedChildren,
   bookingTrial,
   getBookingList,
+  getOneChild,
 };
