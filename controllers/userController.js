@@ -3,7 +3,7 @@ const Children = require("../models/children");
 const Service = require("../models/services");
 const { ObjectId } = require("mongoose").Types;
 const ServiceBookings = require("../models/serviceBookings");
-
+const ProvidersFeedback = require("../models/providersFeedback");
 //--------------- SignUp ----------------//
 
 const signUp = async (req, res) => {
@@ -14,7 +14,9 @@ const signUp = async (req, res) => {
     isStringInvalid(password) ||
     isStringInvalid(phone, "phone")
   ) {
-    return res.status(400).json({ message: "All fields are required and must be valid" });
+    return res
+      .status(400)
+      .json({ message: "All fields are required and must be valid" });
   }
   try {
     const parentExist = await Parent.findOne({ email });
@@ -38,7 +40,7 @@ const signUp = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  if (isStringInvalid(email , "email") || isStringInvalid(password)) {
+  if (isStringInvalid(email, "email") || isStringInvalid(password)) {
     return res.status(400).json({ message: "All fields are required" });
   }
   try {
@@ -302,6 +304,42 @@ const getOneChild = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+
+const createProvidersFeedback = async (req, res) => {
+  try {
+    const {
+      review,
+      rating,
+      childId,
+      providerId,
+      serviceId,
+      parentId,
+      bookingId,
+    } = req.body;
+    console.log("req>>>>", req.body);
+    if (!childId || !providerId || !parentId || !serviceId || !bookingId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+    const feedback = await ProvidersFeedback.create({
+      review,
+      rating,
+      childId: new ObjectId(childId),
+      providerId: new ObjectId(providerId),
+      serviceId: new ObjectId(serviceId),
+      parentId: new ObjectId(parentId),
+      bookingId: new ObjectId(bookingId),
+    });
+
+    if (!feedback) {
+      return res.status(404).json({ message: "feedback not creating" });
+    }
+
+    return res.status(201).json({ success: true, data: feedback });
+  } catch (err) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};
 module.exports = {
   signUp,
   login,
@@ -315,4 +353,5 @@ module.exports = {
   bookingTrial,
   getBookingList,
   getOneChild,
+  createProvidersFeedback,
 };
