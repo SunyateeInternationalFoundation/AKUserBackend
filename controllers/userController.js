@@ -61,6 +61,7 @@ const newChild = async (req, res) => {
   const {
     name,
     age,
+    image,
     gender,
     parentEmail,
     basicInfo,
@@ -79,6 +80,7 @@ const newChild = async (req, res) => {
     const newChild = new Children({
       name,
       age,
+      image,
       gender,
       parentEmail,
       parentId: new ObjectId(parentId),
@@ -155,11 +157,11 @@ const getParent = async (req, res) => {
 const updateParent = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, phone, address, city, pincode } = req.body;
-
+    const { name, email, phone, address, city, pincode , image} = req.body;
+    
     const updatedParent = await Parent.findByIdAndUpdate(
       id,
-      { name, email, phone, address, city, pincode },
+      { name, email, phone, address, city, pincode , image},
       { new: true }
     );
 
@@ -181,7 +183,7 @@ const updateParent = async (req, res) => {
 //--------------- Getting the all services exists ----------------//
 
 const getServices = async (req, res) => {
-  console.log("entered....");
+  //console.log("entered....");
   try {
     const services = await Service.find();
     if (!services.length) {
@@ -206,7 +208,7 @@ const getSelectedProviders = async (req, res) => {
     const providers = await Providers.find({
       services: { $in: [objectId] },
     });
-    console.log("providers", providers);
+    //console.log("providers", providers);
     return res.status(200).json({ success: true, data: providers });
   } catch (error) {
     console.error(error);
@@ -232,6 +234,7 @@ const getSelectedChildren = async (req, res) => {
 };
 
 //--------------- Service booking for demo version ----------------//
+
 const bookingTrial = async (req, res) => {
   try {
     const { serviceId, child, provider, date, time, parentId } = req.body;
@@ -280,13 +283,16 @@ const getBookingList = async (req, res) => {
       .populate("providerId")
       .populate("serviceId");
 
-    console.log("bookingList", bookingList);
+    // console.log("bookingList", bookingList);
     return res.status(200).json({ success: true, data: bookingList });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+//--------------- Getting one child by the ID ----------------//
+
 const getOneChild = async (req, res) => {
   try {
     const { id } = req.params;
@@ -302,6 +308,7 @@ const getOneChild = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+
 module.exports = {
   signUp,
   login,
