@@ -341,7 +341,7 @@ const createProvidersFeedback = async (req, res) => {
     }
 
     return res.status(201).json({ success: true, data: feedback });
-  } catch (err) {
+  } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error", error });
   }
