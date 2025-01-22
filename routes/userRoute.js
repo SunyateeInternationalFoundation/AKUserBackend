@@ -14,5 +14,6 @@ router.post("/booking-trail", userController.bookingTrial);
 router.get("/bookings/:id", userController.getBookingList);
 router.get("/child-details/:id", userController.getOneChild);
 router.post("/providers-feedback", userController.createProvidersFeedback);
+router.get("/get-sessions/:id", userController.getSessions);
 
 module.exports = router;

@@ -346,6 +346,17 @@ const createProvidersFeedback = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+const getSessions = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const session = await ServiceBookings.findById(id).populate("serviceId");
+
+    return res.status(201).json({ success: true, data: session });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};
 module.exports = {
   signUp,
   login,
@@ -360,4 +371,5 @@ module.exports = {
   getBookingList,
   getOneChild,
   createProvidersFeedback,
+  getSessions,
 };
