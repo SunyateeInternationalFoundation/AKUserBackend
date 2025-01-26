@@ -108,6 +108,57 @@ const newChild = async (req, res) => {
   }
 };
 
+const updateChild = async (req, res) => {
+  const {
+    name,
+    age,
+    image,
+    gender,
+    parentEmail,
+    basicInfo,
+    medicalInfo,
+    behavioralInfo,
+    therapyHistory,
+    parentId,
+    admissionGoal,
+  } = req.body;
+  const { id } = req.params;
+  // if (isStringInvalid(name) || isStringInvalid(age) || isStringInvalid(gender) || isStringInvalid(parentEmail)) {
+  //     return res.status(400).json({ message: 'All fields are required' });
+  // }
+
+  try {
+    const updatedChild = await Children.findByIdAndUpdate(
+      id,
+      {
+        name,
+        age,
+        image,
+        gender,
+        parentEmail,
+        parentId: new ObjectId(parentId),
+        basicInfo,
+        extraDetails: {
+          medicalInfo,
+          behavioralInfo,
+          therapyHistory,
+          admissionGoal,
+        },
+      },
+      { new: true }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Child registered successfully",
+      data: updatedChild,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
 //--------------- Getting All children  ----------------//
 
 const getChildren = async (req, res) => {
@@ -390,4 +441,5 @@ module.exports = {
   getOneChild,
   createProvidersFeedback,
   getSessions,
+  updateChild,
 };
