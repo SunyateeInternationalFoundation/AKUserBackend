@@ -252,6 +252,21 @@ const bookingTrial = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+    const sessions = [
+      {
+        sessionNumber: 1,
+        date: new Date(date), 
+        time: time,
+        status: "ongoing", 
+        notes: "",
+        feedback: {
+          therapyFeedback: "",
+          assignment: "",
+        },
+        videoUrl: "",
+      },
+    ];
+
     const serviceBooking = await ServiceBookings.create({
       childId: new ObjectId(child._id),
       providerId: new ObjectId(provider._id),
@@ -261,6 +276,7 @@ const bookingTrial = async (req, res) => {
       serviceId: new ObjectId(serviceId),
       status: "On Going",
       accepted: false,
+      sessions
     });
 
     if (!serviceBooking) {
@@ -357,6 +373,8 @@ const getSessions = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+
+//--------------- Exporting the routes ----------------//
 module.exports = {
   signUp,
   login,

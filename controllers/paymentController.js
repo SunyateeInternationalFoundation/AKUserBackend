@@ -1,7 +1,6 @@
 const Razorpay = require("razorpay");
 const Order = require("../models/paymentDetails");
-const Children = require("../models/children");
-const { Parent } = require("../models/parents");
+
 
 const purchasepremium = async (req, res, next) => {
   try {
